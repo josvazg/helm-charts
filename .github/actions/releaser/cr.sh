@@ -146,7 +146,7 @@ update_helm_repo(){
 }
 
 prepare_helm_repo() {
-    helm repo add mongodb https://mongodb.github.io/helm-charts
+    helm repo add mongodb https://josvazg.github.io/helm-charts
     update_helm_repo
 }
 
@@ -154,7 +154,7 @@ chart_released() {
     local chart_name=$1
     local version=$2
 
-    helm pull "mongodb/${chart_name}" --version "${version}"
+    helm search repo "mongodb/${chart_name}" --version "${version}" | grep -q "${chart_name}\s"
 }
 
 get_latest_tag(){
@@ -166,30 +166,13 @@ get_latest_tag(){
 
 release_changed_charts() {
     local changed_charts=("$@")
-    local retries=30
-    local pause=10
 
-    echo "Releasing Helm Charts: ${changed_charts[*]}"
-    git fetch
-    gh_pages_before=$(git log -1 origin/gh-pages --oneline)
-    echo "gh-pages before at: ${gh-pages-before}"
     helm repo update
     install_chart_releaser
     cleanup_releaser
     package_charts "${changed_charts[@]}"
     release_charts
     update_index
-    echo "Checking helm chart releases updated the gh-pages branch"
-    for ((i=0; i<retries; i++)); do
-        git fetch
-        gh_pages_head=$(git log -1 origin/gh-pages --oneline)
-        if [ "${gh_pages_head}" != "${gh_pages_before}" ]; then
-            return 0
-        fi
-        echo "Still unchanged at '${gh_pages_before}', waiting ${pause} seconds to retry..."
-        sleep "${pause}"
-    done
-    return 1
 }
 
 install_chart_releaser() {
