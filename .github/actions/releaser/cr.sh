@@ -137,16 +137,16 @@ read_chart_version() {
 }
 
 reset_helm_repo() {
-    helm repo remove mongodb
+    helm repo remove jmongodb
     prepare_helm_repo
 }
 
 update_helm_repo(){
-    helm repo update mongodb
+    helm repo update jmongodb
 }
 
 prepare_helm_repo() {
-    helm repo add mongodb https://josvazg.github.io/helm-charts
+    helm repo add jmongodb https://josvazg.github.io/helm-charts
     update_helm_repo
 }
 
@@ -154,7 +154,7 @@ chart_released() {
     local chart_name=$1
     local version=$2
 
-    helm search repo "mongodb/${chart_name}" --version "${version}" | grep -q "${chart_name}\s"
+    helm search repo "jmongodb/${chart_name}" --version "${version}" | grep -q "${chart_name}\s"
 }
 
 get_latest_tag(){
